@@ -85,20 +85,6 @@ if not districts:
     st.error("Не удалось загрузить датасет Main_dataset.xlsx. Проверьте путь к файлу.")
     st.stop()
 
-st.markdown("### Выберите локацию для анализа")
-c1, c2 = st.columns(2)
-with c1:
-    selected_district = st.selectbox("Район", districts)
-with c2:
-    available_micros = district_to_micro.get(selected_district, [])
-    selected_micro = st.selectbox("Микрорайон", available_micros if available_micros else ["Не указано"])
-
-
-if selected_micro == "Не указано":
-    st.warning("Нет данных по выбранному микрорайону для расчета индексов.")
-else:
-    pass 
-
 
 col_inputs, col_results = st.columns([1, 1], gap="large")
 
