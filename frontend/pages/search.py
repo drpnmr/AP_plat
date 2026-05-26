@@ -270,11 +270,6 @@ def show_object_details(row):
     else:
         st.markdown(f"**Район:** {row['Район']}")
     st.markdown(f"**Адрес:** {row['Адрес']}")
-    
-    col_dialog_fav = st.columns(1)[0]
-    with col_dialog_fav:
-        if st.button("Добавить в избранное", key=f"fav_modal_{row.name}", use_container_width=True, type="primary"):
-            pass
             
     st.markdown("---")
     
