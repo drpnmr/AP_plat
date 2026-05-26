@@ -37,47 +37,40 @@ def format_distance_badge(meters_val):
     try:
         meters = int(meters_val)
         
-        # Определяем цвета в зависимости от расстояния
         if meters < 500:
-            # Зеленый тег для близких объектов
+            # Мягкий зелёный
             bg_color = "#E8F5E9"
             text_color = "#2E7D32"
-            border_color = "#A5D6A7"
         elif meters > 3000:
-            # Красный тег для далеких объектов
+            # Мягкий красный
             bg_color = "#FFEBEE"
             text_color = "#C62828"
-            border_color = "#EF9A9A"
         else:
-            # Нейтральный серый/синий для средних расстояний
+            # Стандартный нейтральный
             bg_color = "#F0F2F6"
             text_color = "#31333F"
-            border_color = "#D1D5DB"
 
-        # Красиво форматируем сам текст расстояния
         if meters < 1000:
             dist_str = f"{meters} м"
         else:
             dist_str = f"{meters / 1000:.2f} км".replace('.', ',')
 
-        # Возвращаем аккуратный HTML-badge
         return f"""
         <span style="
             background-color: {bg_color}; 
             color: {text_color}; 
-            border: 1px solid {border_color};
-            padding: 2px 8px; 
-            border-radius: 4px; 
+            padding: 4px 10px; 
+            border-radius: 6px; 
             font-size: 13px; 
-            font-weight: 600;
+            font-weight: bold;
             font-family: sans-serif;
-            display: inline-block;
-            margin-left: 5px;
+            white-space: nowrap;
         ">{dist_str}</span>
         """
     except:
-        return '<span style="color: gray; font-size: 13px;">нет данных</span>'
-        
+        return '<span style="color: gray; font-size: 13px;">—</span>'
+    
+
 def check_price_anomaly(row, package):
     if package is None:
         return None, 0, 0, None
@@ -281,25 +274,46 @@ def show_object_details(row):
                 {"label": "Ближайший парк/сквер", "name_col": "Ближайший парк", "dist_col": "Расстояние до парка (м)"},
             ]
 
+            # Начинаем сборку единого HTML-контейнера-таблицы
+            html_rows = ""
             for item in infra_items:
-                # Берем название объекта и расстояние из строки row
                 obj_name = row.get(item["name_col"])
                 obj_dist = row.get(item["dist_col"])
                 
-                # Если названия нет, пишем "Не указано"
-                obj_name_str = f"«{obj_name}»" if pd.notna(obj_name) and str(obj_name).strip() != "" else "объект не указан"
-                
-                # Генерируем цветную плашку расстояния
+                obj_name_str = str(obj_name).strip() if pd.notna(obj_name) and str(obj_name).strip() != "" else "Не указано"
                 badge_html = format_distance_badge(obj_dist)
                 
-                # Собираем всё в одну красивую строку через st.html
-                st.html(f"""
-                <div style="margin-bottom: 8px; font-family: sans-serif; font-size: 14px; color: #31333F;">
-                    <span style="font-weight: 500;">{item["label"]}:</span> 
-                    <span style="color: #555555;">{obj_name_str}</span> 
-                    {badge_html}
+                # Каждая строка — это флекс-контейнер с тремя чёткими зонами
+                html_rows += f"""
+                <div style="
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    padding: 10px 0; 
+                    border-bottom: 1px solid #EDEDED;
+                    font-family: sans-serif;
+                    font-size: 14px;
+                ">
+                    <div style="font-weight: 600; color: #31333F; width: 220px; flex-shrink: 0;">
+                        {item["label"]}
+                    </div>
+                    
+                    <div style="color: #666666; flex-grow: 1; padding: 0 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {obj_name_str}
+                    </div>
+                    
+                    <div style="flex-shrink: 0; text-align: right; width: 80px;">
+                        {badge_html}
+                    </div>
                 </div>
-                """)
+                """
+
+            # Выводим всю готовую сетку разом
+            st.html(f"""
+            <div style="background: #FFFFFF; border-radius: 8px; padding: 5px 0;">
+                {html_rows}
+            </div>
+            """)
 
     with st.container(border=True):
         st.markdown("### ПЛОЩАДЬ")
