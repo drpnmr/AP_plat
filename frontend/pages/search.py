@@ -491,12 +491,6 @@ if st.session_state.search_clicked and not df.empty:
                         st.caption(f"Расстояние до центра: {row['Расстояние до center (м)']/1000:.1f} км" if 'Расстояние до center (м)' in row else f"Расстояние до центра: {row['Расстояние до центра (м)']/1000:.1f} км")
                 
                 with col_action:
-                    st.markdown("<div style='padding-top: 10px;'></div>", unsafe_allow_html=True)
-                    if st.button("Подробнее", key=f"btn_details_{idx}", use_container_width=True):
-                        show_object_details(row)
-                    
-                    if st.button("В избранное", key=f"fav_card_{idx}", use_container_width=True, type="primary"):
-                        pass
                     
 
                     # Уникальный хэш или ID для каждой строки, например, по индексу или адресу
@@ -519,7 +513,7 @@ if st.session_state.search_clicked and not df.empty:
                         st.session_state.compare_list.remove(obj_id)
                         st.rerun()
 
-                    if st.button("Подробнее", key=f"btn_details_{idx}", use_container_width=True):
+                    if st.button("Подробнее", key=f"btn_search_details_{idx}", use_container_width=True):
                         show_object_details(row)
 
 
