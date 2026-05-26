@@ -603,102 +603,95 @@ if len(st.session_state.compare_list) == 2:
             else: return f"{v} лет"
 
         # Строим таблицу сравнения через HTML
-        # Строим таблицу сравнения через HTML с поддержкой темной/светлой темы
         st.html(f"""
-        <table style="
-            width: 100%; 
-            border-collapse: collapse; 
-            font-family: sans-serif; 
-            font-size: 14px; 
-            color: var(--text-color, #31333F);
-        ">
+        <table style="width:100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px;">
             <thead>
-                <tr style="background-color: var(--secondary-background-color, #F0F2F6); text-align: left;">
-                    <th style="padding: 12px; width: 34%; border-bottom: 2px solid var(--border-color, #D1D5DB);">Характеристика</th>
-                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid var(--border-color, #D1D5DB); color: #2563EB;">Объект №1</th>
-                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid var(--border-color, #D1D5DB); color: #10B981;">Объект №2</th>
+                <tr style="text-align: left;">
+                    <th style="padding: 12px; width: 34%; border-bottom: 2px solid #D1D5DB;">Характеристика</th>
+                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid #D1D5DB;">Объект №1</th>
+                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid #D1D5DB;">Объект №2</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Название</td>
-                    <td style="padding: 10px; color: #2563EB; font-weight: 500;">{obj1['Название']}</td>
-                    <td style="padding: 10px; color: #10B981; font-weight: 500;">{obj2['Название']}</td>
+                    <td style="padding: 10px; font-weight: 500;">{obj1['Название']}</td>
+                    <td style="padding: 10px; font-weight: 500;">{obj2['Название']}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Стоимость</td>
-                    <td style="padding: 10px; font-weight: bold; color: #2563EB;">{price1}</td>
-                    <td style="padding: 10px; font-weight: bold; color: #10B981;">{price2}</td>
+                    <td style="padding: 10px;">{price1}</td>
+                    <td style="padding: 10px;">{price2}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Цена за м²</td>
                     <td style="padding: 10px;">{price_m2_1}</td>
                     <td style="padding: 10px;">{price_m2_2}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Район</td>
                     <td style="padding: 10px;">{obj1.get('Район', '—')}</td>
                     <td style="padding: 10px;">{obj2.get('Район', '—')}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Микрорайон</td>
                     <td style="padding: 10px;">{obj1.get('Микрорайон', '—')}</td>
                     <td style="padding: 10px;">{obj2.get('Микрорайон', '—')}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
+                <tr style="border-bottom: 1px solid #EDEDED; ">
                     <td style="padding: 10px; font-weight: bold;">Ремонт</td>
                     <td style="padding: 10px;">{obj1.get('Ремонт', '—')}</td>
                     <td style="padding: 10px;">{obj2.get('Ремонт', '—')}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
+                <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Возраст дома</td>
                     <td style="padding: 10px;">{fmt_age(obj1.get('Возраст дома'))}</td>
                     <td style="padding: 10px;">{fmt_age(obj2.get('Возраст дома'))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
+                <tr style="border-bottom: 1px solid #EDEDED; ">
                     <td style="padding: 10px; font-weight: bold;">Высота потолков</td>
                     <td style="padding: 10px;">{fmt_h(obj1.get('Высота потолков'))}</td>
                     <td style="padding: 10px;">{fmt_h(obj2.get('Высота потолков'))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
-                    <td style="padding: 10px; font-weight: bold;">📍 До центра города</td>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">До центра города</td>
                     <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до центра (м)', 0))}</td>
                     <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до центра (м)', 0))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
-                    <td style="padding: 10px; font-weight: bold;">🚂 До вокзала Краснодар-1</td>
+                <tr style="border-bottom: 1px solid #EDEDED; ">
+                    <td style="padding: 10px; font-weight: bold;">До вокзала Краснодар-1</td>
                     <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до вокзала Краснодар-1 (м)', 0))}</td>
                     <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до вокзала Краснодар-1 (м)', 0))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
-                    <td style="padding: 10px; font-weight: bold;">✈️ До аэропорта</td>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">До аэропорта</td>
                     <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до аэропорта (м)', 0))}</td>
                     <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до аэропорта (м)', 0))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
-                    <td style="padding: 10px; font-weight: bold;">🏫 До ближайшей школы</td>
-                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj1.get('Ближайшая школа', '')}</span></td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj2.get('Ближайшая школа', '')}</span></td>
+                <tr style="border-bottom: 1px solid #EDEDED; ">
+                    <td style="padding: 10px; font-weight: bold;">До школы</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая школа', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая школа', '')}</span></td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
-                    <td style="padding: 10px; font-weight: bold;">👶 До детского сада</td>
-                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj1.get('Ближайший детский сад', '')}</span></td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj2.get('Ближайший детский сад', '')}</span></td>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">До детского сада</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайший детский сад', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайший детский сад', '')}</span></td>
                 </tr>
-                <tr style="border-bottom: 1px solid #EDEDED; background-color: rgba(128, 128, 128, 0.05);">
-                    <td style="padding: 10px; font-weight: bold;">🏥 До взрослой поликлиники</td>
-                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj1.get('Ближайшая взрослая поликлиника', '')}</span></td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj2.get('Ближайшая взрослая поликлиника', '')}</span></td>
+                <tr style="border-bottom: 1px solid #EDEDED; ">
+                    <td style="padding: 10px; font-weight: bold;">До взрослой поликлиники</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая взрослая поликлиника', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая взрослая поликлиника', '')}</span></td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED);">
-                    <td style="padding: 10px; font-weight: bold;">🧸 До детской поликлиники</td>
-                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj1.get('Ближайшая детская поликлиника', '')}</span></td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj2.get('Ближайшая детская поликлиника', '')}</span></td>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">До детской поликлиники</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая детская поликлиника', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая детская поликлиника', '')}</span></td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color, #EDEDED); background-color: rgba(128, 128, 128, 0.05);">
-                    <td style="padding: 10px; font-weight: bold;">🌳 До парка / сквера</td>
-                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj1.get('Ближайший парк', '')}</span></td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до парка (м)', 0) if pd.isna(obj1.get('Расстояние до парка (м)')) else obj2.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:var(--text-color); opacity: 0.6;">{obj2.get('Ближайший парк', '')}</span></td>
+                <tr style="border-bottom: 1px solid #EDEDED; ">
+                    <td style="padding: 10px; font-weight: bold;">До парка / сквера</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайший парк', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до park (м)', 0) if pd.isna(obj1.get('Расстояние до парка (м)')) else obj2.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайший парк', '')}</span></td>
                 </tr>
             </tbody>
         </table>
