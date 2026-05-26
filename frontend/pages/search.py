@@ -498,8 +498,6 @@ if st.session_state.search_clicked and not df.empty:
                     
                     # Проверяем, была ли уже выбрана эта квартира
                     is_checked = obj_id in st.session_state.compare_list
-
-                    # Чекбокс для выбора
                     chosen = st.checkbox("Выбрать для сравнения", key=f"chk_{idx}", value=is_checked)
                     
                     if chosen and obj_id not in st.session_state.compare_list:
@@ -556,17 +554,24 @@ if len(st.session_state.compare_list) == 2:
         
         # Кнопка быстрой очистки сравнения
 # Кнопка быстрой очистки сравнения
-        if st.button("Очистить сравнение", type="secondary"):
-            # 1. Сбрасываем триггеры чекбоксов в session_state, чтобы они снялись на экране
+# 1. Выносим логику очистки в отдельную функцию-колбэк
+        def clear_comparison_callback():
+            # Сбрасываем чекбоксы в session_state
             for obj_id in st.session_state.compare_list:
                 orig_idx = obj_id.split("_")[-1]
                 chk_key = f"chk_{orig_idx}"
                 if chk_key in st.session_state:
                     st.session_state[chk_key] = False
             
-            # 2. Очищаем сам список сравнения
+            # Очищаем сам список
             st.session_state.compare_list = []
-            st.rerun()
+
+        # 2. Передаем колбэк в кнопку (st.rerun() внутри on_click не нужен, Streamlit сделает его сам)
+        st.button(
+            "Очистить сравнение", 
+            type="secondary", 
+            on_click=clear_comparison_callback
+        )
 
         # Форматируем цены для вывода
         price1 = f"{int(obj1['Цена']):,}".replace(",", " ") + " ₽"
