@@ -628,8 +628,8 @@ if len(st.session_state.compare_list) == 2:
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
                     <td style="padding: 10px; font-weight: bold;">Стоимость</td>
-                    <td style="padding: 10px; font-weight: bold;">{price1}</td>
-                    <td style="padding: 10px; font-weight: bold;">{price2}</td>
+                    <td style="padding: 10px;">{price1}</td>
+                    <td style="padding: 10px;">{price2}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED;">
                     <td style="padding: 10px; font-weight: bold;">Цена за м²</td>
