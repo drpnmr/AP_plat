@@ -512,7 +512,7 @@ if st.session_state.search_clicked and not df.empty:
                     chosen = st.checkbox("Выбрать для сравнения", key=f"chk_{idx}", value=is_checked)
                     
                     if chosen and obj_id not in st.session_state.compare_list:
-                        if len(st.session_state.compare_list) > 2:
+                        if len(st.session_state.compare_list) >= 2:
                             st.warning("Можно сравнивать только 2 объекта одновременно!")
                             # Сбрасываем чекбокс обратно (опционально, сработает при следующем реруне)
                         else:
