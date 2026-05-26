@@ -10,6 +10,9 @@ st.set_page_config(page_title="Поиск недвижимости", layout="wid
 st.title("ПОИСК НЕДВИЖИМОСТИ")
 show_sidebar()
 
+if "compare_list" not in st.session_state:
+    st.session_state.compare_list = []
+
 @st.cache_resource
 def load_ml_package():
     possible_paths = ["models/house_price_model.pkl", "frontend/models/house_price_model.pkl", "../models/house_price_model.pkl"]
@@ -494,7 +497,32 @@ if st.session_state.search_clicked and not df.empty:
                     
                     if st.button("В избранное", key=f"fav_card_{idx}", use_container_width=True, type="primary"):
                         pass
-                        
+                    
+
+                    # Уникальный хэш или ID для каждой строки, например, по индексу или адресу
+                    obj_id = f"{row['Название']}_{idx}"
+                    
+                    # Проверяем, была ли уже выбрана эта квартира
+                    is_checked = obj_id in st.session_state.compare_list
+
+                    # Чекбокс для выбора
+                    chosen = st.checkbox("Выбрать для сравнения", key=f"chk_{idx}", value=is_checked)
+                    
+                    if chosen and obj_id not in st.session_state.compare_list:
+                        if len(st.session_state.compare_list) >= 2:
+                            st.warning("Можно сравнивать только 2 объекта одновременно!")
+                            # Сбрасываем чекбокс обратно (опционально, сработает при следующем реруне)
+                        else:
+                            st.session_state.compare_list.append(obj_id)
+                            st.rerun()
+                    elif not chosen and obj_id in st.session_state.compare_list:
+                        st.session_state.compare_list.remove(obj_id)
+                        st.rerun()
+
+                    if st.button("Подробнее", key=f"btn_details_{idx}", use_container_width=True):
+                        show_object_details(row)
+
+
                 st.markdown("<div style='margin-bottom: 5px;'></div>", unsafe_allow_html=True)
               
         st.markdown("---")
@@ -514,3 +542,100 @@ if st.session_state.search_clicked and not df.empty:
         st.warning("Объектов с такими параметрами не найдено. Попробуйте изменить критерии поиска.")
 else:
     st.info("Данные недоступны или пустой датасет.")
+
+
+# =========================================================
+# БЛОК СРАВНЕНИЯ ОБЪЕКТОВ (ВЫВОДИТСЯ В КОНЦЕ СТРАНИЦЫ)
+# =========================================================
+if len(st.session_state.compare_list) == 2:
+    st.markdown("---")
+    with st.expander("📊 Сравнение выбранных объявлений", expanded=True):
+        
+        # Находим строки в исходном датафрейме df по сохраненным id
+        selected_rows = []
+        for obj_id in st.session_state.compare_list:
+            # Извлекаем оригинальный индекс из созданного ключа
+            orig_idx = int(obj_id.split("_")[-1])
+            selected_rows.append(df.iloc[orig_idx])
+            
+        obj1, obj2 = selected_rows[0], selected_rows[1]
+        
+        # Кнопка быстрой очистки сравнения
+        if st.button("Очистить сравнение", type="secondary"):
+            st.session_state.compare_list = []
+            st.rerun()
+
+        # Форматируем цены для вывода
+        price1 = f"{int(obj1['Цена']):,}".replace(",", " ") + " ₽"
+        price2 = f"{int(obj2['Цена']):,}".replace(",", " ") + " ₽"
+        
+        price_m2_1 = f"{int(obj1['Цена за кв.м']):,}".replace(",", " ") + " ₽/м²"
+        price_m2_2 = f"{int(obj2['Цена за кв.м']):,}".replace(",", " ") + " ₽/м²"
+
+        # Функция для безопасного форматирования метров в таблице
+        def fmt_m(val):
+            try: return f"{int(val)} м" if int(val) < 1000 else f"{int(val)/1000:.2f} км".replace('.', ',')
+            except: return "—"
+
+        # Строим таблицу сравнения через HTML
+        st.html(f"""
+        <table style="width:100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px;">
+            <thead>
+                <tr style="background-color: #F0F2F6; text-align: left;">
+                    <th style="padding: 12px; width: 34%; border-bottom: 2px solid #D1D5DB;">Характеристика</th>
+                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid #D1D5DB; color: #1E3A8A;">Объект №1</th>
+                    <th style="padding: 12px; width: 33%; border-bottom: 2px solid #D1D5DB; color: #065F46;">Объект №2</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">Название</td>
+                    <td style="padding: 10px; color: #1E3A8A; font-weight: 500;">{obj1['Название']}</td>
+                    <td style="padding: 10px; color: #065F46; font-weight: 500;">{obj2['Название']}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">Стоимость</td>
+                    <td style="padding: 10px; font-weight: bold; color: #1E3A8A;">{price1}</td>
+                    <td style="padding: 10px; font-weight: bold; color: #065F46;">{price2}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">Цена за м²</td>
+                    <td style="padding: 10px;">{price_m2_1}</td>
+                    <td style="padding: 10px;">{price_m2_2}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">Район / Микрорайон</td>
+                    <td style="padding: 10px;">{obj1['Район']} / {obj1['Микрорайон']}</td>
+                    <td style="padding: 10px;">{obj2['Район']} / {obj2['Микрорайон']}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">Общая / Жилая / Кухня</td>
+                    <td style="padding: 10px;">{obj1['Общая площадь']} / {obj1.get('Жилая площадь', '—')} / {obj1.get('Площадь кухни', '—')} м²</td>
+                    <td style="padding: 10px;">{obj2['Общая площадь']} / {obj2.get('Жилая площадь', '—')} / {obj2.get('Площадь кухни', '—')} м²</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">Этаж / Ремонт</td>
+                    <td style="padding: 10px;">{obj1['Этаж']}/{obj1['Этажность дома']} этаж ({obj1.get('Ремонт', '—')})</td>
+                    <td style="padding: 10px;">{obj2['Этаж']}/{obj2['Этажность дома']} этаж ({obj2.get('Ремонт', '—')})</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">До центра города</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до центра (м)', 0))}</td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до center (м)', 0) if pd.isna(obj1.get('Расстояние до центра (м)')) else obj2.get('Расстояние до центра (м)', 0))}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">🏫 До ближайшей школы</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая школа', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до школы (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая школа', '')}</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">👶 До детского сада</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайший детский сад', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайший детский сад', '')}</span></td>
+                </tr>
+            </tbody>
+        </table>
+        """)
+elif len(st.session_state.compare_list) == 1:
+    # Небольшая плашка-напоминалка, если выбран пока только один объект
+    st.info("💡 Выбран 1 объект для сравнения. Отметьте второй объект в списке выше, чтобы сопоставить их.")
