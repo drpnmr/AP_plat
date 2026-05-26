@@ -105,7 +105,7 @@ if not sub_df.empty:
         fig_hist = px.histogram(
             district_sub_df,
             x='Цена',
-            color_discrete_sequence=["#002950"],
+            color_discrete_sequence=["#0054A3"],
             labels={'Цена': 'Полная стоимость квартиры (₽)', 'count': 'Количество объектов'},
         )
         fig_hist.update_layout(

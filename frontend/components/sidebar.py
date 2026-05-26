@@ -12,7 +12,7 @@ def show_sidebar():
     """, unsafe_allow_html=True)
 
     with st.sidebar:
-        st.title("Главное меню")
+        st.title("АНАЛИТИКА НЕДВИЖИМОСТИ КРАСНОДАРА")
         st.markdown("---")
 
         if st.button("Аналитика по районам", use_container_width=True):
