@@ -33,15 +33,50 @@ def load_data():
 
 df = load_data()
 
-def format_distance(meters_val):
-        try:
-            meters = int(meters_val)
-            if meters < 1000:
-                return f"{meters} м"
-            else:
-                return f"{meters / 1000:.2f} км"
-        except (ValueError, TypeError):
-            return "Не указано"
+def format_distance_badge(meters_val):
+    try:
+        meters = int(meters_val)
+        
+        # Определяем цвета в зависимости от расстояния
+        if meters < 500:
+            # Зеленый тег для близких объектов
+            bg_color = "#E8F5E9"
+            text_color = "#2E7D32"
+            border_color = "#A5D6A7"
+        elif meters > 3000:
+            # Красный тег для далеких объектов
+            bg_color = "#FFEBEE"
+            text_color = "#C62828"
+            border_color = "#EF9A9A"
+        else:
+            # Нейтральный серый/синий для средних расстояний
+            bg_color = "#F0F2F6"
+            text_color = "#31333F"
+            border_color = "#D1D5DB"
+
+        # Красиво форматируем сам текст расстояния
+        if meters < 1000:
+            dist_str = f"{meters} м"
+        else:
+            dist_str = f"{meters / 1000:.2f} км".replace('.', ',')
+
+        # Возвращаем аккуратный HTML-badge
+        return f"""
+        <span style="
+            background-color: {bg_color}; 
+            color: {text_color}; 
+            border: 1px solid {border_color};
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            font-weight: 600;
+            font-family: sans-serif;
+            display: inline-block;
+            margin-left: 5px;
+        ">{dist_str}</span>
+        """
+    except:
+        return '<span style="color: gray; font-size: 13px;">нет данных</span>'
         
 def check_price_anomaly(row, package):
     if package is None:
@@ -237,22 +272,34 @@ def show_object_details(row):
     st.markdown("---")
     
     with st.container(border=True):
-        st.markdown("### ИНФРАСТРУКТУРА")
-        
-        if pd.notna(row.get('Расстояние до школы (м)')):
-            st.write(f"**Ближайшая школа:** {format_distance(row['Расстояние до школы (м)'])}")
-            
-        if pd.notna(row.get('Расстояние до детсада (м)')):
-            st.write(f"**Ближайший детский сад:** {format_distance(row['Расстояние до детсада (м)'])}")
-            
-        if pd.notna(row.get('Расстояние до взрослой поликлиники (м)')):
-            st.write(f"**Ближайшая взрослая поликлиника:** {format_distance(row['Расстояние до взрослой поликлиники (м)'])}")
-            
-        if pd.notna(row.get('Расстояние до детской поликлиники (м)')):
-            st.write(f"**Ближайшая детская поликлиника:** {format_distance(row['Расстояние до детской поликлиники (м)'])}")
-            
-        if pd.notna(row.get('Расстояние до парка (м)')):
-            st.write(f"**Ближайший парк:** {format_distance(row['Расстояние до парка (м)'])}")
+        # Вспомогательный словарь для генерации строк, чтобы не писать кучу дублирующего кода
+            infra_items = [
+                {"label": "Ближайшая школа", "name_col": "Ближайшая школа", "dist_col": "Расстояние до школы (м)"},
+                {"label": "Ближайший детский сад", "name_col": "Ближайший детский сад", "dist_col": "Расстояние до детсада (м)"},
+                {"label": "Взрослая поликлиника", "name_col": "Ближайшая взрослая поликлиника", "dist_col": "Расстояние до взрослой поликлиники (м)"},
+                {"label": "Детская поликлиника", "name_col": "Ближайшая детская поликлиника", "dist_col": "Расстояние до детской поликлиники (м)"},
+                {"label": "Ближайший парк/сквер", "name_col": "Ближайший парк", "dist_col": "Расстояние до парка (м)"},
+            ]
+
+            for item in infra_items:
+                # Берем название объекта и расстояние из строки row
+                obj_name = row.get(item["name_col"])
+                obj_dist = row.get(item["dist_col"])
+                
+                # Если названия нет, пишем "Не указано"
+                obj_name_str = f"«{obj_name}»" if pd.notna(obj_name) and str(obj_name).strip() != "" else "объект не указан"
+                
+                # Генерируем цветную плашку расстояния
+                badge_html = format_distance_badge(obj_dist)
+                
+                # Собираем всё в одну красивую строку через st.html
+                st.html(f"""
+                <div style="margin-bottom: 8px; font-family: sans-serif; font-size: 14px; color: #31333F;">
+                    <span style="font-weight: 500;">{item["label"]}:</span> 
+                    <span style="color: #555555;">{obj_name_str}</span> 
+                    {badge_html}
+                </div>
+                """)
 
     with st.container(border=True):
         st.markdown("### ПЛОЩАДЬ")
