@@ -270,6 +270,9 @@ def show_object_details(row):
     else:
         st.markdown(f"**Район:** {row['Район']}")
     st.markdown(f"**Адрес:** {row['Адрес']}")
+    
+    if pd.notna(row.get('Ссылка')):
+        st.link_button("Открыть объявление на ЦИАН", row['Ссылка'], use_container_width=True, type="primary")
             
     st.markdown("---")
     
@@ -380,12 +383,6 @@ def show_object_details(row):
             st.write(f"**До вокзала Краснодар-1:** {row['Расстояние до вокзала Краснодар-1 (м)']/1000:.2f} км")
         if pd.notna(row.get('Расстояние до аэропорта (м)')): 
             st.write(f"**До аэропорта Пашковский:** {row['Расстояние до аэропорта (м)']/1000:.2f} км")
-
-
-        
-    st.markdown("---")
-    if pd.notna(row.get('Ссылка')):
-        st.link_button("Открыть объявление на ЦИАН", row['Ссылка'], use_container_width=True, type="primary")
 
 
 col_rooms, col_price, col_district = st.columns([1.5, 2.5, 2.5], gap="small")
