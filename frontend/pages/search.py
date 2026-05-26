@@ -505,6 +505,7 @@ if st.session_state.search_clicked and not df.empty:
                             st.warning("Можно сравнивать только 2 объекта одновременно!")
                             # Сбрасываем чекбокс обратно (опционально, сработает при следующем реруне)
                         else:
+                            st.session_state.compare_list.append(obj_id)
                             if len(st.session_state.compare_list) == 2:
                                 st.toast("Два объекта выбрано. Пролистайте страницу вниз для просмотра сравнения.")
                             st.rerun()
