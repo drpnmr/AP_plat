@@ -336,12 +336,12 @@ if data_is_valid:
         if abs_contribution > 5000:
             if rub_contribution > 0:
                 factors_up.append({
-                    'text': f"<b>Значение <b>'{user_val}'<b> для параметра <b>{feature_name}</b> увеличивает стоимость на <b>+{contribution_str}</b>",
+                    'text': f"<b>Значение <b>'{user_val}'</b> для параметра <b>{feature_name}</b> увеличивает стоимость на <b>+{contribution_str}</b>",
                     'val': abs_contribution
                 })
             else:
                 factors_down.append({
-                    'text': f"Значение <b>'{user_val}'<b> для параметра <b>{feature_name}</b> снижает стоимость на <b>-{contribution_str}</b>",
+                    'text': f"Значение <b>'{user_val}'</b> для параметра <b>{feature_name}</b> снижает стоимость на <b>-{contribution_str}</b>",
                     'val': abs_contribution
                 })
 
