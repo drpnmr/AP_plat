@@ -308,6 +308,7 @@ if data_is_valid:
     current_accumulated_log = base_log_value
 
     # Проходим по признакам ровно в том порядке, в котором они идут в датасете
+    # Проходим по признакам ровно в том порядке, в котором они идут в датасете
     for feature_name, shap_val in zip(all_features, current_shap_values.values):
         user_val = input_data.iloc[0][feature_name]
         
@@ -322,29 +323,94 @@ if data_is_valid:
         # Обновляем накопительный логарифм для следующего шага
         current_accumulated_log += shap_val
         
-        # Форматирование отображения значений признаков
+        # Отсекаем совсем мелкие колебания (менее 5 000 рублей)
+        if abs_contribution <= 5000:
+            continue
+
+        # 1. КРАСИВОЕ ФОРМАТИРОВАНИЕ ЗНАЧЕНИЯ (убираем .0 у поплавков)
         if isinstance(user_val, float):
-            val_str = f"{user_val:.1f}"
+            if user_val.is_integer():
+                val_str = str(int(user_val))
+            else:
+                val_str = f"{user_val:.1f}".replace('.', ',')
         elif isinstance(user_val, (int, np.integer)):
             val_str = f"{user_val:,}".replace(",", " ") if user_val > 1000 else str(user_val)
         else:
             val_str = str(user_val)
 
         contribution_str = f"{abs_contribution:,} ₽".replace(",", " ")
+        is_up = rub_contribution > 0
+        
+        # 2. УМНЫЙ ВЫВОД (ГЕНЕРАТОР ТЕКСТА ПО ЛОГИКЕ АТРИБУТОВ)
+        text = ""
+        
+        if feature_name == 'Общая площадь':
+            text = f"Большая общая площадь (<b>{val_str} м²</b>) выступает главным драйвером цены" if is_up else f"Небольшая общая площадь (<b>{val_str} м²</b>) ограничивает стоимость"
+        
+        elif feature_name == 'Жилая площадь':
+            text = f"Просторная жилая зона (<b>{val_str} м²</b>) добавляет ценности объекту" if is_up else f"Маленькая жилая площадь (<b>{val_str} м²</b>) тянет цену вниз"
+            
+        elif feature_name == 'Площадь кухни':
+            text = f"Большая и комфортная кухня (<b>{val_str} м²</b>) ценится покупателями" if is_up else f"Ограниченное пространство кухни (<b>{val_str} м²</b>) снижает привлекательность"
 
-        # Отсекаем совсем мелкие колебания (менее 5 000 рублей)
-        if abs_contribution > 5000:
-            if rub_contribution > 0:
-                factors_up.append({
-                    'text': f"<b>Значение <b>'{user_val}'</b> для параметра <b>{feature_name}</b> увеличивает стоимость на <b>+{contribution_str}</b>",
-                    'val': abs_contribution
-                })
+        elif feature_name == 'Комнаты/Планировка':
+            text = f"Востребованная планировка (<b>{val_str}</b>) существенно поднимает рейтинг жилья" if is_up else f"Выбранный формат комнат/планировки (<b>{val_str}</b>) уступает по ликвидности другим вариантам"
+
+        elif feature_name == 'Район':
+            text = f"Престижное расположение в районе <b>{val_str}</b>" if is_up else f"Локация в районе <b>{val_str}</b> оценивается рынком дешевле аналогичного жилья в центре"
+
+        elif feature_name == 'Микрорайон':
+            text = f"Высокий спрос на жилье в микрорайоне <b>{val_str}</b>" if is_up else f"Особенности ценообразования в микрорайоне <b>{val_str}</b>"
+
+        elif feature_name == 'Ремонт':
+            text = f"Качественный тип отделки (<b>{val_str}</b>) освобождает от затрат на ремонт" if is_up else f"Текущее состояние отделки (<b>{val_str}</b>) требует вложений и дисконтирует объект"
+
+        elif feature_name == 'Возраст дома':
+            text = f"Новый или свежий год постройки дома (<b>{val_str} лет</b>)" if is_up else f"Значительный износ здания и возраст дома (<b>{val_str} лет</b>)"
+
+        elif feature_name == 'Этаж':
+            text = f"Расположение на удобном <b>{val_str} этаже</b>" if is_up else f"Специфика <b>{val_str} этажа</b> (например, первый/последний или слишком высокий)"
+
+        elif feature_name == 'Тип этажа':
+            if val_str in ["Первый", "Последний"]:
+                text = f"Расположение на этаже типа «<b>{val_str}</b>» традиционно закладывает скидку в чек" if not is_up else f"Расположение на этаже типа «<b>{val_str}</b>»"
             else:
-                factors_down.append({
-                    'text': f"Значение <b>'{user_val}'</b> для параметра <b>{feature_name}</b> снижает стоимость на <b>-{contribution_str}</b>",
-                    'val': abs_contribution
-                })
+                text = f"Удобный средний этаж (тип: <b>{val_str}</b>)"
 
+        elif feature_name in ['Расстояние до центра (м)', 'Расстояние до central (м)']:
+            text = f"Близость к центру города (всего <b>{val_str} м</b>)" if is_up else f"Удалённость от центра города (<b>{val_str} м</b>) увеличивает время в пути"
+
+        elif feature_name == 'Расстояние до вокзала Краснодар-1 (м)':
+            text = f"Удобная транспортная доступность до вокзала Краснодар-1 (<b>{val_str} м</b>)" if is_up else f"Большое расстояние до вокзала Краснодар-1 (<b>{val_str} м</b>)"
+
+        elif feature_name == 'Продаётся с мебелью':
+            text = "Квартира укомплектована мебелью, что закладывается в конечную стоимость" if val_str == "Да" else "Квартира продаётся без мебели"
+
+        elif feature_name in ['Расстояние до park (м)', 'Расстояние до парка (м)']:
+            text = f"Близость к зелёным зонам и паркам (<b>{val_str} м</b>)" if is_up else f"Удалённость от парков (<b>{val_str} м</b>)"
+
+        elif feature_name == 'Высота потолков':
+            text = f"Высокие потолки (<b>{val_str} м</b>) создают ощущение объёма" if is_up else f"Стандартная высота потолков (<b>{val_str} м</b>)"
+
+        elif feature_name == 'Отопление':
+            text = f"Выгодный тип отопления (<b>{val_str}</b>) оптимизирует платежи" if is_up else f"Тип отопления <b>{val_str}</b> менее популярен на рынке"
+
+        # Шаблон по умолчанию, если признак специфический и не попал в основные правила
+        else:
+            clean_name = feature_name.replace('Расстояние до', 'Дистанция до').replace(' (м)', ' м')
+            text = f"Показатель <b>{clean_name}</b> со значением <b>{val_str}</b> позитивно влияет на модель" if is_up else f"Показатель <b>{clean_name}</b> (<b>{val_str}</b>) уменьшает расчётную стоимость"
+
+        # Распределяем по контейнерам
+        if is_up:
+            factors_up.append({
+                'text': f"{text} <span style='float:right; color:#2E7D32; font-weight:bold;'>+{contribution_str}</span>",
+                'val': abs_contribution
+            })
+        else:
+            factors_down.append({
+                'text': f"{text} <span style='float:right; color:#C62828; font-weight:bold;'>-{contribution_str}</span>",
+                'val': abs_contribution
+            })
 
     factors_up = sorted(factors_up, key=lambda x: x['val'], reverse=True)
     factors_down = sorted(factors_down, key=lambda x: x['val'], reverse=True)
