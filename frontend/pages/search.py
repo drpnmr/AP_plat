@@ -283,7 +283,7 @@ def show_object_details(row):
                 obj_name_str = str(obj_name).strip() if pd.notna(obj_name) and str(obj_name).strip() != "" else "Не указано"
                 badge_html = format_distance_badge(obj_dist)
                 
-                # Каждая строка — это флекс-контейнер с тремя чёткими зонами
+                # Используем проценты вместо жестких px, убрали обрезку строки
                 html_rows += f"""
                 <div style="
                     display: flex; 
@@ -292,23 +292,21 @@ def show_object_details(row):
                     padding: 10px 0; 
                     border-bottom: 1px solid #EDEDED;
                     font-family: sans-serif;
-                    font-size: 14px;
                 ">
-                    <div style="font-weight: 600; color: #31333F; width: 220px; flex-shrink: 0;">
+                    <div style="font-weight: 600; color: #31333F; width: 30%; font-size: 14px; flex-shrink: 0;">
                         {item["label"]}
                     </div>
                     
-                    <div style="color: #666666; flex-grow: 1; padding: 0 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <div style="color: #444444; width: 50%; padding: 0 10px; font-size: 13px; line-height: 1.3; word-wrap: break-word;">
                         {obj_name_str}
                     </div>
                     
-                    <div style="flex-shrink: 0; text-align: right; width: 80px;">
+                    <div style="width: 20%; flex-shrink: 0; text-align: right;">
                         {badge_html}
                     </div>
                 </div>
                 """
 
-            # Выводим всю готовую сетку разом
             st.html(f"""
             <div style="background: #FFFFFF; border-radius: 8px; padding: 5px 0;">
                 {html_rows}
