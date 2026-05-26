@@ -568,8 +568,22 @@ if len(st.session_state.compare_list) == 2:
 
         # Функция для безопасного форматирования метров в таблице
         def fmt_m(val):
-            try: return f"{int(val)} м" if int(val) < 1000 else f"{int(val)/1000:.2f} км".replace('.', ',')
-            except: return "—"
+            try: 
+                return f"{int(val)} м" if int(val) < 1000 else f"{int(val)/1000:.2f} км".replace('.', ',')
+            except: 
+                return "—"
+
+        # Функция для безопасного форматирования высоты потолков
+        def fmt_h(val):
+            return f"{val} м" if pd.notna(val) else "—"
+
+        # Функция для безопасного форматирования возраста дома
+        def fmt_age(val):
+            if pd.isna(val): return "—"
+            v = int(val)
+            if v % 10 == 1 and v % 100 != 11: return f"{v} год"
+            elif v % 10 in [2, 3, 4] and v % 100 not in [12, 13, 14]: return f"{v} года"
+            else: return f"{v} лет"
 
         # Строим таблицу сравнения через HTML
         st.html(f"""
@@ -598,24 +612,44 @@ if len(st.session_state.compare_list) == 2:
                     <td style="padding: 10px;">{price_m2_2}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
-                    <td style="padding: 10px; font-weight: bold;">Район / Микрорайон</td>
-                    <td style="padding: 10px;">{obj1['Район']} / {obj1['Микрорайон']}</td>
-                    <td style="padding: 10px;">{obj2['Район']} / {obj2['Микрорайон']}</td>
+                    <td style="padding: 10px; font-weight: bold;">Район</td>
+                    <td style="padding: 10px;">{obj1.get('Район', '—')}</td>
+                    <td style="padding: 10px;">{obj2.get('Район', '—')}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED;">
-                    <td style="padding: 10px; font-weight: bold;">Общая / Жилая / Кухня</td>
-                    <td style="padding: 10px;">{obj1['Общая площадь']} / {obj1.get('Жилая площадь', '—')} / {obj1.get('Площадь кухни', '—')} м²</td>
-                    <td style="padding: 10px;">{obj2['Общая площадь']} / {obj2.get('Жилая площадь', '—')} / {obj2.get('Площадь кухни', '—')} м²</td>
+                    <td style="padding: 10px; font-weight: bold;">Микрорайон</td>
+                    <td style="padding: 10px;">{obj1.get('Микрорайон', '—')}</td>
+                    <td style="padding: 10px;">{obj2.get('Микрорайон', '—')}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
-                    <td style="padding: 10px; font-weight: bold;">Этаж / Ремонт</td>
-                    <td style="padding: 10px;">{obj1['Этаж']}/{obj1['Этажность дома']} этаж ({obj1.get('Ремонт', '—')})</td>
-                    <td style="padding: 10px;">{obj2['Этаж']}/{obj2['Этажность дома']} этаж ({obj2.get('Ремонт', '—')})</td>
+                    <td style="padding: 10px; font-weight: bold;">Ремонт</td>
+                    <td style="padding: 10px;">{obj1.get('Ремонт', '—')}</td>
+                    <td style="padding: 10px;">{obj2.get('Ремонт', '—')}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED;">
-                    <td style="padding: 10px; font-weight: bold;">До центра города</td>
+                    <td style="padding: 10px; font-weight: bold;">Возраст дома</td>
+                    <td style="padding: 10px;">{fmt_age(obj1.get('Возраст дома'))}</td>
+                    <td style="padding: 10px;">{fmt_age(obj2.get('Возраст дома'))}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">Высота потолков</td>
+                    <td style="padding: 10px;">{fmt_h(obj1.get('Высота потолков'))}</td>
+                    <td style="padding: 10px;">{fmt_h(obj2.get('Высота потолков'))}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">📍 До центра города</td>
                     <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до центра (м)', 0))}</td>
-                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до center (м)', 0) if pd.isna(obj1.get('Расстояние до центра (м)')) else obj2.get('Расстояние до центра (м)', 0))}</td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до центра (м)', 0))}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">🚂 До вокзала Краснодар-1</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до вокзала Краснодар-1 (м)', 0))}</td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до вокзала Краснодар-1 (м)', 0))}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">✈️ До аэропорта</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до аэропорта (м)', 0))}</td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до аэропорта (м)', 0))}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
                     <td style="padding: 10px; font-weight: bold;">🏫 До ближайшей школы</td>
@@ -627,9 +661,21 @@ if len(st.session_state.compare_list) == 2:
                     <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайший детский сад', '')}</span></td>
                     <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детсада (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайший детский сад', '')}</span></td>
                 </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">🏥 До взрослой поликлиники</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая взрослая поликлиника', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до взрослой поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая взрослая поликлиника', '')}</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED;">
+                    <td style="padding: 10px; font-weight: bold;">🧸 До детской поликлиники</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайшая детская поликлиника', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до детской поликлиники (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайшая детская поликлиника', '')}</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDEDED; background-color: #F9FAFB;">
+                    <td style="padding: 10px; font-weight: bold;">🌳 До парка / сквера</td>
+                    <td style="padding: 10px;">{fmt_m(obj1.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj1.get('Ближайший парк', '')}</span></td>
+                    <td style="padding: 10px;">{fmt_m(obj2.get('Расстояние до park (м)', 0) if pd.isna(obj1.get('Расстояние до парка (м)')) else obj2.get('Расстояние до парка (м)', 0))} <br><span style="font-size:11px; color:gray;">{obj2.get('Ближайший парк', '')}</span></td>
+                </tr>
             </tbody>
         </table>
         """)
-elif len(st.session_state.compare_list) == 1:
-    # Небольшая плашка-напоминалка, если выбран пока только один объект
-    st.info("💡 Выбран 1 объект для сравнения. Отметьте второй объект в списке выше, чтобы сопоставить их.")
