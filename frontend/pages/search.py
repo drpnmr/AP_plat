@@ -555,7 +555,16 @@ if len(st.session_state.compare_list) == 2:
         obj1, obj2 = selected_rows[0], selected_rows[1]
         
         # Кнопка быстрой очистки сравнения
+# Кнопка быстрой очистки сравнения
         if st.button("Очистить сравнение", type="secondary"):
+            # 1. Сбрасываем триггеры чекбоксов в session_state, чтобы они снялись на экране
+            for obj_id in st.session_state.compare_list:
+                orig_idx = obj_id.split("_")[-1]
+                chk_key = f"chk_{orig_idx}"
+                if chk_key in st.session_state:
+                    st.session_state[chk_key] = False
+            
+            # 2. Очищаем сам список сравнения
             st.session_state.compare_list = []
             st.rerun()
 
