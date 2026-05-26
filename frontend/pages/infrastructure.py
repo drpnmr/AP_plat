@@ -6,7 +6,7 @@ import math
 import matplotlib.pyplot as plt
 from components.sidebar import show_sidebar
 
-st.set_page_config(page_title="Оценка infrastructure", layout="wide")
+st.set_page_config(page_title="Оценка инфраструктуры", layout="wide")
 st.title("ОЦЕНКА ИНФРАСТРУКТУРЫ ДЛЯ МИКРОРАЙОНОВ")
 
 show_sidebar()
