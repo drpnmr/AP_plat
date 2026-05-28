@@ -4,7 +4,7 @@ import numpy as np
 import requests
 from components.sidebar import show_sidebar
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "https://ap-plat.onrender.com"
 
 def clip_value(val, min_v, max_v):
     """Помогает удержать дефолтное значение в рамках динамических границ слайдера"""

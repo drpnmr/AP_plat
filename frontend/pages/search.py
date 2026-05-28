@@ -10,7 +10,7 @@ st.title("ПОИСК НЕДВИЖИМОСТИ")
 show_sidebar()
 
 # URL твоего FastAPI бэкенда
-BASE_API_URL = "http://localhost:8000/api/v1"
+BASE_API_URL = "https://ap-plat.onrender.com"
 
 # Инициализация состояний сессии
 if "compare_list" not in st.session_state:
