@@ -193,8 +193,8 @@ def predict_price(req: ApartmentPredictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-DB_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DB_URL)
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
 
 @app.get("/api/v1/analytics/top-districts", tags=["Аналитика"])
 def get_top_districts():

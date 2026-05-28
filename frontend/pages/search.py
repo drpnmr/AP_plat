@@ -12,6 +12,7 @@ show_sidebar()
 # URL твоего FastAPI бэкенда
 BASE_API_URL = "https://ap-plat.onrender.com"
 
+
 # Инициализация состояний сессии
 if "compare_list" not in st.session_state:
     st.session_state.compare_list = []
@@ -22,7 +23,7 @@ if "compare_data" not in st.session_state:
 @st.cache_data(ttl=600)
 def fetch_meta_data():
     try:
-        response = requests.get(f"{BASE_API_URL}/apartments/meta")
+        response = requests.get(f"{BASE_API_URL}/api/v1/apartments/meta")
         if response.status_code == 200:
             return response.json()
     except Exception as e:
@@ -41,7 +42,7 @@ def search_apartments_api(district, rooms, price_min, price_max):
         params["rooms"] = rooms
 
     try:
-        response = requests.get(f"{BASE_API_URL}/apartments/search", params=params)
+        response = requests.get(f"{BASE_API_URL}/api/v1/apartments/search", params=params)
         if response.status_code == 200:
             return response.json()
     except Exception as e:
@@ -102,7 +103,7 @@ def check_price_anomaly_via_api(row):
     }
 
     try:
-        response = requests.post(f"{BASE_API_URL}/predict", json=payload)
+        response = requests.post(f"{BASE_API_URL}/api/v1/predict", json=payload)
         if response.status_code == 200:
             pred_data = response.json()
             predicted_price = pred_data["predicted_price"]
@@ -120,7 +121,7 @@ def check_price_anomaly_via_api(row):
         payload_up = payload.copy()
         payload_up["renovation"] = target_remont
         try:
-            response_up = requests.post(f"{BASE_API_URL}/predict", json=payload_up)
+            response_up = requests.post(f"{BASE_API_URL}/api/v1/predict", json=payload_up)
             if response_up.status_code == 200:
                 predicted_upgrade_price = response_up.json()["predicted_price"]
                 added_value = predicted_upgrade_price - predicted_price
