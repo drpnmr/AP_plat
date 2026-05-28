@@ -5,7 +5,7 @@ from components.sidebar import show_sidebar
 import requests
 import plotly.express as px
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "https://ap-plat.onrender.com"
 
 st.set_page_config(
     page_title="Недвижимость Краснодара",
