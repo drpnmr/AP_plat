@@ -8,7 +8,7 @@ openpyxl
 plotly
 catboost
 
-# Компоненты бэкэнда без жестких ограничений версий
 fastapi
 uvicorn
 requests
+sqlalchemy
